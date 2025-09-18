@@ -1,0 +1,9 @@
+.todo {
+	display: flex;
+	padding: 5px;
+	border-bottom: 1px solid grey;
+}
+
+.todoTitle {
+	flex-grow: 1;
+}
