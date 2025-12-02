@@ -1,33 +1,27 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import styles from './control-panel.module.css';
+import { selectSearchPhrase, selectIsSortingEnable } from '../../selectors';
 import { debounce } from '../../utils';
+import { addTodo } from '../../actions/todos-actions';
+import { setSearchPhrase, setSortingEnable } from '../../actions/control-panel-actions';
 
-export const ControlPanel = ({
-	onTodoAdd,
-	searchPhrase,
-	setSearchPhrase,
-	isSortingEnable,
-	setIsSortingEnable,
-}) => {
+export const ControlPanel = () => {
+	const searchPhrase = useSelector(selectSearchPhrase);
+	const isSortingEnable = useSelector(selectIsSortingEnable);
 	const [localSearch, setLocalSearch] = useState(searchPhrase);
 
+	const dispatch = useDispatch();
+
 	const debouncedSetSearch = useRef(
-		debounce((value) => {
-			setSearchPhrase(value);
+		debounce((localSearch) => {
+			dispatch(setSearchPhrase(localSearch))
 		}, 300),
 	);
 
 	useEffect(() => {
 		debouncedSetSearch.current(localSearch);
 	}, [localSearch]);
-
-	const onSearchPhraseChange = ({ target }) => {
-		setLocalSearch(target.value);
-	};
-
-	const onSortingChange = () => {
-		setIsSortingEnable(!isSortingEnable);
-	};
 
 	return (
 		<div className={styles.controlPanel}>
@@ -36,15 +30,15 @@ export const ControlPanel = ({
 				type="text"
 				placeholder="Поиск..."
 				value={localSearch}
-				onChange={onSearchPhraseChange}
+				onChange={({ target }) => setLocalSearch(target.value)}
 			/>
 			<input
 				className={styles.sortingButton}
 				type="checkbox"
 				checked={isSortingEnable}
-				onChange={onSortingChange}
+				onChange={() => dispatch(setSortingEnable(!isSortingEnable))}
 			/>
-			<button className={styles.addButton} onClick={onTodoAdd}>
+			<button className={styles.addButton} onClick={() => dispatch(addTodo())}>
 				Добавить
 			</button>
 		</div>
